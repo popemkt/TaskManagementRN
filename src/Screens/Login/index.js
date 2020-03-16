@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Keyboard, StyleSheet, Text, View, Alert } from 'react-native';
-import { login } from '../../Services/commonServices';
+import { Alert, Keyboard, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+
 import Button from '../../Components/Button';
 import TextInput from '../../Components/TextInput';
+import { login } from '../../Services/commonServices';
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState('');
@@ -69,6 +70,7 @@ export default function Login({ navigation }) {
       />
       <Button
         icon={{ name: 'arrow-right' }}
+        buttonStyle={{marginVertical: 20, width: '80%'}}
         title='LOGIN'
         onPress={onSubmit}
       />

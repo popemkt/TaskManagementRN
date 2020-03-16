@@ -1,9 +1,10 @@
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Input, ListItem } from 'react-native-elements';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import Button from '../../../Components/Button';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import QrScanner from '../../../Components/QrScanner';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import database from '../../../Services';
 import { theme } from '../../../Constants/configs';
@@ -11,6 +12,7 @@ import { theme } from '../../../Constants/configs';
 export default function Users({ navigation }) {
   const [listUsers, setListUsers] = useState([]);
   const [userSearch, setUserSearch] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
 
   const filter = l => {
     return Boolean(
@@ -22,12 +24,18 @@ export default function Users({ navigation }) {
     );
   };
 
+  const onScanned = data => {
+    let user = listUsers.find(user => user.Id == data);
+    user ? navigation.navigate('UserDetails', {...user}) : alert('User not found!');
+  }
+
   useEffect(() => {
     setListUsers(database.users);
   }, []);
 
   return (
     <View style={s.container}>
+      <QrScanner isVisible={isVisible} setIsVisible={setIsVisible} action={data => onScanned(data)}/>
       <Text style={s.header}>{'Users'}</Text>
       <View style={s.row}>
         <Input
@@ -45,12 +53,17 @@ export default function Users({ navigation }) {
           placeholder='Username or Id'
         />
         <Button
+          title='Find QR '
+          icon={{ name: 'camera', size: 10 }}
+          onPress={() => setIsVisible(true)}
+        />
+        <Button
           title='Create '
           icon={{ name: 'plus', size: 10 }}
           onPress={() => navigation.navigate('CreateUser')}
         />
       </View>
-      <View style={{width: '100%'}}>
+      <View style={{ width: '100%' }}>
         <ScrollView
           contentContainerStyle={{
             paddingVertical: 8,

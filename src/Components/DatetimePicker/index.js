@@ -13,11 +13,10 @@ const MyDateTimePicker = ({ date, setDate }) => {
     setReset(false);
     let dateValue = selectedDate || date;
     setDate(dateValue);
-    if (selectedDate !=null && check == true) {
+    if (selectedDate != null && check == true) {
       setCheck(false);
       setMode('time');
-      setReset(false);
-      
+      setReset(true);
     } 
 };
 
