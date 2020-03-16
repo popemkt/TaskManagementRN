@@ -1,5 +1,6 @@
-import Button from '../../../Components/Button';
 import CreateTask from '../Tasks/CreateTask'
+import DrawerButton from '../../../Components/DrawerButton';
+import LogoutButton from '../../../Components/LogoutButton'
 import React from 'react';
 import TaskDetails from '../Tasks/TaskDetails';
 import Tasks from '../Tasks';
@@ -13,21 +14,10 @@ function TasksRoutes({ navigation }) {
       screenOptions={{
         headerTitle: 'Tasks',
         headerRight: () => (
-          <Button
-            onPress={() => navigation.popToTop()}
-            title='Logout '
-            icon={{ name: 'arrow-right' }}
-            buttonStyle={{ marginRight: 10 }}
-          />
+            <LogoutButton navigation={navigation}/>
         ),
         headerLeft: () => (
-          <Button
-            onPress={() => navigation.openDrawer()}
-            title=''
-            color='#00cc00'
-            icon={{ name: 'hamburger' }}
-            buttonStyle={{ marginLeft: 10 }}
-          />
+            <DrawerButton navigation={navigation}/>
         ),
       }}
       initialRouteName='Tasks'

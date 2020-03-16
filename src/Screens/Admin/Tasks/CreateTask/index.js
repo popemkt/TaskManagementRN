@@ -1,22 +1,33 @@
 import React, { useState } from 'react';
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
-  Picker,
-  ScrollView,
 } from 'react-native';
-import { getDatetime } from '../../../../Common/utils';
-import Button from '../../../../Components/Button';
-import DatetimePicker from '../../../../Components/DatetimePicker'
 
-function TaskDetails() {
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState();
-  const [name, setName] = useState('');
+import Button from '../../../../Components/Button';
+import DatetimePicker from '../../../../Components/DatetimePicker';
+import UserChooser from '../../../../Components/UserChooser';
+
+function CreateTask() {
+  const [isVisible, setIsVisible] = useState();
+  const [task, setTask] = useState({
+    Description: null,
+    Name: null,
+    dueDate: null,
+    ProcessorId: null,
+  });
+
   return (
     <View style={{ flex: 1 }}>
+      <UserChooser
+        isVisible={isVisible}
+        setIsVisible={setIsVisible}
+        action={t => setTask({ ...task, ProcessorId: t.Id })}
+      />
       <ScrollView
         contentContainerStyle={{
           paddingVertical: 30,
@@ -33,8 +44,8 @@ function TaskDetails() {
             style={s.input}
             numberOfLines={4}
             multiline
-            value={description}
-            onChangeText={text => setName(text)}
+            value={task.Description}
+            onChangeText={text => setTask({ ...task, Description: text })}
           />
         </View>
 
@@ -43,17 +54,25 @@ function TaskDetails() {
           <TextInput
             placeholder='Enter description'
             style={s.input}
-            value={name}
-            onChangeText={text => setName(text)}
+            value={task.Name}
+            onChangeText={text => setTask({ ...task, Name: text })}
             maxLength={40}
           />
         </View>
-        <View style={{...s.row, justifyContent: 'flex-start'}}>
+        <View style={{ ...s.row, justifyContent: 'flex-start' }}>
           <Text>{'Due date:  '}</Text>
-            <DatetimePicker date={dueDate} setDate={setDueDate} />
+          <DatetimePicker
+            date={task.dueDate}
+            setDate={date => setTask({ ...task, dueDate: date })}
+          />
         </View>
         <View>
-          <Text style={s.label}>{`Processor:`}</Text>
+          <TouchableOpacity onPress={() => setIsVisible(true)}>
+            <Text style={s.label}>
+              {'Processor: ' +
+                (task.ProcessorId ? task.ProcessorId : 'Touch to select processor')}
+            </Text>
+          </TouchableOpacity>
           <View style={s.row}>
             <Button
               title='CONFIRM'
@@ -117,4 +136,4 @@ const s = StyleSheet.create({
   },
 });
 
-export default TaskDetails;
+export default CreateTask;

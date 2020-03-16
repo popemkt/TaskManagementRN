@@ -2,55 +2,52 @@ import { Input, ListItem } from 'react-native-elements';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import Button from '../../../Components/Button';
+import Button from '../../../../Components/Button';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import database from '../../../Services';
-import { theme } from '../../../Constants/configs';
+import UserChooser from '../../../../Components/UserChooser';
+import database from '../../../../Services';
+import { theme } from '../../../../Constants/configs';
 
-export default function Users({ navigation }) {
+export default function Users({ navigation, route }) {
+  const groupInfo = { ...route.params };
   const [listUsers, setListUsers] = useState([]);
-  const [userSearch, setUserSearch] = useState('');
+  const [modalVisibility, setModalVisibility] = useState(false);
+  const [chosenUser, setChosenUser] = useState(null);
 
   const filter = l => {
-    return Boolean(
-      l.RoleID !== 1 &&
-        (!userSearch ||
-          (userSearch &&
-            (l.Username.toLowerCase().includes(userSearch.toLowerCase()) ||
-              l.Id.toString().includes(userSearch.toString())))),
-    );
+    return Boolean(true);
   };
 
   useEffect(() => {
+    console.log(chosenUser);
     setListUsers(database.users);
-  }, []);
+  }, [chosenUser]);
 
   return (
     <View style={s.container}>
-      <Text style={s.header}>{'Users'}</Text>
-      <View style={s.row}>
-        <Input
-          rightIcon={
-            <Icon
-              name='chevron-right'
-              type='entypo'
-              color='#86939e'
-              size={25}
-            />
-          }
-          value={userSearch}
-          onChangeText={text => setUserSearch(text)}
-          containerStyle={{ width: '50%' }}
-          placeholder='Username or Id'
-        />
+      <UserChooser
+        isVisible={modalVisibility}
+        setIsVisible={setModalVisibility}
+        action={setChosenUser}
+        criteria={l => l.RoleID !== 2}
+      />
+      <Text style={s.header}>{"Group's Users"}</Text>
+      <View
+        style={{
+          width: '98%',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Text style={s.minorHeader}>{groupInfo.GroupName}</Text>
         <Button
-          title='Create '
+          title='Add '
           icon={{ name: 'plus', size: 10 }}
-          onPress={() => navigation.navigate('CreateUser')}
+          onPress={() => setModalVisibility(true)}
         />
       </View>
-      <View style={{width: '100%'}}>
+      <View style={{ width: '100%' }}>
         <ScrollView
           contentContainerStyle={{
             paddingVertical: 8,
@@ -72,9 +69,6 @@ export default function Users({ navigation }) {
                       color: theme.colors.blue,
                     }}
                     key={i}
-                    onPress={() => {
-                      navigation.navigate('UserDetails', { ...l });
-                    }}
                     rightTitle={l.Id + ' ID'}
                     title={l.Username.toString()}
                   />

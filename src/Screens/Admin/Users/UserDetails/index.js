@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+
 import Button from '../../../../Components/Button';
 
 export default function Admin({ admin, navigation, data, route }) {
@@ -7,7 +8,7 @@ export default function Admin({ admin, navigation, data, route }) {
   const [user, setUser] = useState({ ...route.params });
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{name || 'TaskName'}</Text>
+      <Text style={styles.header}>{name || 'User'}</Text>
       <Text style={styles.minorHeader}>{'User Details\n'}</Text>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>{'Fullname'}</Text>
@@ -27,12 +28,14 @@ export default function Admin({ admin, navigation, data, route }) {
         />
       </View>
       <View>
-        <Text style={styles.label}>{`Id: ${user.Id}`}</Text>
+        <Text style={styles.label}>{`User Id: ${user.Id}`}</Text>
+        <Text style={styles.label}>{`Username: ${user.Username}`}</Text>
         <Text style={styles.label}>{`Phone: ${user.Phone}`}</Text>
+        <Text style={styles.label}>{`Role: ${user.RoleName}`}</Text>
         <Text style={styles.label}>{`Mail: ${user.Mail}`}</Text>
         <Text style={styles.label}>{`DoB: ${user.DoB}`}</Text>
         <Text style={styles.label}>{`Group: ${user.GroupName}`}</Text>
-        <View style={styles.row}>
+        <View style={{...styles.row, marginVertical: 20}}>
           <Button
             title='DELETE'
             // onPress={}

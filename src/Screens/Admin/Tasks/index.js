@@ -1,6 +1,6 @@
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Input, ListItem } from 'react-native-elements';
 import React, { useContext, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AdminContext } from '../../../Contexts';
 import Button from '../../../Components/Button';
@@ -37,7 +37,7 @@ export default function Tasks({ navigation }) {
   }, [searchAgain]);
 
   return (
-    <View style={styles.container}>
+    <View style={s.container}>
       <OptionModal
         isVisible={optionModalVisibility}
         setIsVisile={setOptionModalVisibility}
@@ -45,9 +45,9 @@ export default function Tasks({ navigation }) {
         setOptions={setOptions}
         setList={setListTasks}
       />
-      <Text style={styles.header}>{admin.Username || 'Admin Board'}</Text>
-      <View style={styles.row}>
-        <Text style={styles.minorHeader}>{'Tasks'}</Text>
+      <Text style={s.header}>{admin.Username || 'Admin Board'}</Text>
+      <View style={s.row}>
+        <Text style={s.minorHeader}>{'Tasks'}</Text>
         <Button
           icon={{ name: 'recycle', size: 10 }}
           buttonStyle={{ marginLeft: 10, marginBottom: 10 }}
@@ -57,7 +57,7 @@ export default function Tasks({ navigation }) {
           }}
         />
       </View>
-      <View style={styles.row}>
+      <View style={s.row}>
         <Button
           title='Options '
           icon={{ name: 'filter', size: 10 }}
@@ -85,7 +85,7 @@ export default function Tasks({ navigation }) {
           onPress={() => navigation.navigate('CreateTask')}
         />
       </View>
-      <View style={styles.container}>
+      <View style={{width: '100%'}}>
         <ScrollView
           contentContainerStyle={{
             paddingVertical: 8,
@@ -97,7 +97,7 @@ export default function Tasks({ navigation }) {
                   return (
                     <ListItem
                       Component={TouchableOpacity}
-                      style={styles.listItem}
+                      style={s.listItem}
                       roundAvatar
                       chevron
                       subtitle={truncate(
@@ -115,6 +115,8 @@ export default function Tasks({ navigation }) {
                         navigation.navigate('TaskDetails', { ...l });
                       }}
                       rightTitle={l.StatusName}
+                      rightSubtitle={l.AcceptanceName}
+                      rightTitleStyle={{color: 'green'}}
                       title={l.TaskName}
                     />
                   );
@@ -127,7 +129,7 @@ export default function Tasks({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   listItem: {
-    width: 400,
+    width: '100%',
   },
   minorHeader: {
     fontSize: 20,

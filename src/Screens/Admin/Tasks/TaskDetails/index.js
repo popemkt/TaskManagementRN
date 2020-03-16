@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
 import {
+  Picker,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
-  Picker,
-  ScrollView,
 } from 'react-native';
-import { getDatetime } from '../../../../Common/utils';
+import React, { useState } from 'react';
+
 import Button from '../../../../Components/Button';
 import ImagePicker from '../../../../Components/ImagePicker';
+import { getDatetime } from '../../../../Common/utils';
 
 function TaskDetails({ route }) {
   const [name] = useState(route.params?.TaskName);
@@ -122,7 +123,7 @@ function TaskDetails({ route }) {
           >{`Time manager last commented: ${getDatetime(task.TimeManagerCommented)}`}</Text>
           <Text style={s.label}>{'Image confirmation'}</Text>
           <ImagePicker image={image} setImage={setImage} />
-          <View style={s.row}>
+          <View style={{...s.row, marginVertical: 20}}>
             <Button
               title='DELETE'
               // onPress={}

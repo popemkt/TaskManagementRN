@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
-import axios from 'axios';
 import { BASE_URL } from '../Constants/configs';
+import axios from 'axios';
 
 export async function login(username, password, navigation) {
   //   Alert.alert(username + '   ' + password);
@@ -10,7 +10,7 @@ export async function login(username, password, navigation) {
       Password: password,
     })
     .then(response => {
-      switch (response.data.Data.RoleId) {
+      switch (response.data.Data.RoleID) {
         case 1:
           navigation.navigate('Admin', { ...response.data.Data });
       }

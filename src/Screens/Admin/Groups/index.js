@@ -1,61 +1,92 @@
-import React, { useEffect, useState, createContext } from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
-import OptionModal from './Modals/OptionModal/OptionModal';
-import database from '../../../Services';
-import Button from '../../../Components/Button';
-import { truncate } from '../../../Common/utils';
-import { ListItem } from 'react-native-elements';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Input, ListItem } from 'react-native-elements';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export default function Tasks({ admin, navigation, data, route }) {
+import Button from '../../../Components/Button';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import database from '../../../Services';
+
+export default function Tasks({ navigation }) {
   const [listGroups, setListGroups] = useState([]);
-  const [options, setOptions] = useState({
-    filter: false,
-    fromDate: null,
-    toDate: null,
-    status: null,
-    userId: null,
-  });
-  const [optionModalVisibility, setOptionModalVisibility] = useState(true);
+  const [searchAgain, setSearchAgain] = useState(true);
+  const [groupSearch, setGroupSearch] = useState('');
+
+  const filter = l => {
+    return Boolean(true);
+  };
 
   useEffect(() => {
-    setListTasks(database.tasks);
-  }, []);
+    setListGroups(database.groups);
+  }, [searchAgain]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>{'Groups'}</Text>
-      <View style={styles.container}>
-        {listTasks
-          ? listTasks.map((l, i) => (
-              <ListItem
-                Component={TouchableOpacity}
-                style={styles.listItem}
-                roundAvatar
-                chevron
-                subtitle={truncate(l.Description, 40)}
-                bottomDivider
-                leftAvatar={{
-                  source: {
-                    uri:
-                      'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-                  },
-                }}
-                key={i}
-                onPress={() => {
-                  Alert.alert(l.Description);
-                  navigation.navigate('TaskDetails', { ...l });
-                }}
-                title={l.TaskName}
-              />
-            ))
-          : null}
+    <View style={s.container}>
+      <Text style={s.header}>{'Groups'}</Text>
+      <View style={s.row}>
+        <Input
+          rightIcon={
+            <Icon
+              name='chevron-right'
+              type='entypo'
+              color='#86939e'
+              size={25}
+            />
+          }
+          value={groupSearch}
+          onChangeText={text => setGroupSearch(text)}
+          containerStyle={{ width: '60%' }}
+          placeholder='Group name or Id'
+        />
+        <Button
+          title='Create '
+          icon={{ name: 'plus', size: 10 }}
+          onPress={() => navigation.navigate('CreateGroup')}
+        />
+      </View>
+      <View style={{ width: '100%' }}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingVertical: 8,
+          }}
+        >
+          {listGroups
+            ? listGroups.map((l, i) => {
+                if (filter(l)) {
+                  return (
+                    <ListItem
+                      Component={TouchableOpacity}
+                      style={s.listItem}
+                      roundAvatar
+                      chevron
+                      subtitle={
+                        l.MangerId === null
+                          ? 'Manager not assigned.'
+                          : 'Manager ID: ' + l.MangerId
+                      }
+                      bottomDivider
+                      leftIcon={{
+                        name: 'group',
+                        type: 'font-awesome',
+                        color: '#2089dc',
+                      }}
+                      key={l.GroupId}
+                      onPress={() => {
+                        navigation.navigate('GroupMembers', { ...l });
+                      }}
+                      title={l.GroupName + ' - ID: ' + l.GroupId}
+                    />
+                  );
+                }
+              })
+            : null}
+        </ScrollView>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
@@ -71,10 +102,15 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   listItem: {
-    width: 400,
+    width: '100%',
   },
   minorHeader: {
     fontSize: 20,
     marginLeft: 10,
+  },
+  row: {
+    width: '98%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

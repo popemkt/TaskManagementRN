@@ -1,24 +1,22 @@
+import { Button, Picker, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
-import { Button, View, Text, Picker, StyleSheet } from 'react-native';
-import Modal from 'react-native-modal';
+
 import DateTimePicker from '../../../../../Components/DatetimePicker';
+import Modal from 'react-native-modal';
 
 function OptionModal({
   isVisible,
   setIsVisile,
-  list,
-  setList,
   options,
   setOptions,
 }) {
   const [fromDate, setFromDate] = useState();
   const [toDate, setToDate] = useState();
   const [status, setStatus] = useState('Java');
-  const [userId, setUserId] = useState();
 
   return (
     <Modal isVisible={isVisible} style={{ alignItems: 'center' }}>
-      <View style={{ ...styles.margin, ...styles.modal }}>
+      <View style={{ ...styles.margin, ...styles.modal, paddingVertical: 10, paddingHorizontal: 20, }}>
         <Text>{'Options'}</Text>
         <Picker
           selectedValue={status}
@@ -37,9 +35,7 @@ function OptionModal({
         </View>
         <View
           style={{
-            ...status.margin,
             flexDirection: 'row',
-            alignItems: 'center',
             justifyContent: 'space-evenly',
           }}
         >
@@ -58,9 +54,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   margin: {
-    // marginTop: 10,
-    // marginBottom: 10,
-    margin: 10,
+    marginHorizontal: 10,
   },
 });
 
