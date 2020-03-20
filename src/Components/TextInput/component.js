@@ -5,12 +5,11 @@ import React from 'react';
 export default function TextInput({
   label,
   placeholder,
-  iconName,
+  icon,
   errorMessage,
   value,
   onChangeText,
   style,
-  iconSize,
   ...moreProps
 }) {
   return (
@@ -18,8 +17,8 @@ export default function TextInput({
       placeholder={placeholder}
       placeholderTextColor='grey'
       leftIcon={
-        iconName ? (
-          <Icon name={iconName} size={iconSize ? iconSize : 24} color='black' />
+        icon ? (
+          <Icon name={icon.name} size={ icon.size || 24} color={icon.color || 'black'} />
         ) : null
       }
       labelStyle={{ fontSize: 20, fontWeight: 'bold' }}
@@ -28,7 +27,7 @@ export default function TextInput({
       errorMessage={errorMessage}
       value={value}
       onChangeText={onChangeText}
-      inputStyle={{ paddingLeft: 30, ...style }}
+      inputStyle={{ paddingLeft: 30 }}
       {...moreProps}
     />
   );

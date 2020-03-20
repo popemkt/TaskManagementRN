@@ -12,7 +12,7 @@ import Button from '../../../../Components/Button';
 import ImagePicker from '../../../../Components/ImagePicker';
 import { getDatetime } from '../../../../Common/utils';
 
-function TaskDetails({ route }) {
+function TaskDetails({ navigation ,route }) {
   const [name] = useState(route.params?.TaskName);
   const [image, setImage] = useState(null);
   const [task, setTask] = useState({ ...route.params });
@@ -125,18 +125,13 @@ function TaskDetails({ route }) {
           <ImagePicker image={image} setImage={setImage} />
           <View style={{...s.row, marginVertical: 20}}>
             <Button
-              title='DELETE'
-              // onPress={}
-              buttonStyle={{ backgroundColor: 'red' }}
-            />
-            <Button
               title='UPDATE'
               // onPress={}
               buttonStyle={{ backgroundColor: 'green' }}
             />
             <Button
               title='CANCEL'
-              // onPress={}
+              onPress={() => navigation.goBack()}
               buttonStyle={{ backgroundColor: 'grey' }}
             />
           </View>

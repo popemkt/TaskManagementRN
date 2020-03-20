@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 
+import Button from '../../../../Components/Button';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import UserChooser from '../../../../Components/UserChooser';
 
@@ -55,6 +56,18 @@ function CreateGroup() {
                 : 'Touch to select manager')}
           </Text>
         </TouchableOpacity>
+        <View style={s.row}>
+            <Button
+              title='CONFIRM'
+              // onPress={}
+              buttonStyle={{ backgroundColor: 'green' }}
+            />
+            <Button
+              title='CANCEL'
+              // onPress={}
+              buttonStyle={{ backgroundColor: 'red' }}
+            />
+          </View>
       </ScrollView>
     </View>
   );

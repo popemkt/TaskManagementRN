@@ -1,9 +1,11 @@
-import React from 'react';
-import { Image, View, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import Constants from 'expo-constants';
-import Button from '../Button';
 import * as Permissions from 'expo-permissions';
+
+import { Image, StyleSheet, View } from 'react-native';
+
+import Button from '../Button';
+import Constants from 'expo-constants';
+import React from 'react';
 
 export default class MyImagePicker extends React.Component {
   constructor(props) {
@@ -16,10 +18,10 @@ export default class MyImagePicker extends React.Component {
     return (
       <>
         <View style={s.row}>
-          <Button title='Pick an image' onPress={this._pickImage} />
+          <Button icon={{ name: 'folder-plus' }} onPress={this._pickImage} />
           <Button
             buttonStyle={{ marginLeft: 10 }}
-            title='Take picture'
+            icon={{ name: 'camera' }}
             onPress={this._takePicture}
           />
         </View>
@@ -78,6 +80,8 @@ export default class MyImagePicker extends React.Component {
 
 const s = StyleSheet.create({
   imageContainer: {
+    marginVertical: 10,
+    width: '100%',
     justifyContent: 'center',
     alignContent: 'center',
     flexDirection: 'column',

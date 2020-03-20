@@ -12,7 +12,7 @@ import Button from '../../../../Components/Button';
 import DatetimePicker from '../../../../Components/DatetimePicker';
 import UserChooser from '../../../../Components/UserChooser';
 
-function CreateTask() {
+function CreateTask({ navigation }) {
   const [isVisible, setIsVisible] = useState();
   const [task, setTask] = useState({
     Description: null,
@@ -83,8 +83,8 @@ function CreateTask() {
             />
             <Button
               title='CANCEL'
-              // onPress={}
-              buttonStyle={{ backgroundColor: 'red' }}
+              onPress={() => navigation.goBack()}
+              buttonStyle={{ backgroundColor: 'grey' }}
             />
           </View>
         </View>
