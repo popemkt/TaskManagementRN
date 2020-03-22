@@ -5,20 +5,28 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Button from '../../../Components/Button';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import database from '../../../Services';
+import { getAllGroups } from '../../../Services/groupServices';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function Tasks({ navigation }) {
   const [listGroups, setListGroups] = useState([]);
-  const [searchAgain, setSearchAgain] = useState(true);
   const [groupSearch, setGroupSearch] = useState('');
+  const focused = useIsFocused();
 
   const filter = l => {
-    return Boolean(true);
+    return Boolean(
+      !groupSearch ||
+        (groupSearch &&
+          l.GroupName.toLowerCase().includes(groupSearch.toLowerCase())),
+    );
   };
 
   useEffect(() => {
-    setListGroups(database.groups);
-  }, [searchAgain]);
+    if (focused)
+      getAllGroups().then(res => {
+        setListGroups(res.data.Data);
+      });
+  }, [focused]);
 
   return (
     <View style={s.container}>
@@ -36,7 +44,7 @@ export default function Tasks({ navigation }) {
           value={groupSearch}
           onChangeText={text => setGroupSearch(text)}
           containerStyle={{ width: '60%' }}
-          placeholder='Group name or Id'
+          placeholder='Group name'
         />
         <Button
           title='Create '
@@ -60,9 +68,7 @@ export default function Tasks({ navigation }) {
                       roundAvatar
                       chevron
                       subtitle={
-                        l.MangerId === null
-                          ? 'Manager not assigned.'
-                          : 'Manager ID: ' + l.MangerId
+                        `Group Id: ${l.GroupId}`
                       }
                       bottomDivider
                       leftIcon={{
@@ -74,7 +80,8 @@ export default function Tasks({ navigation }) {
                       onPress={() => {
                         navigation.navigate('GroupMembers', { ...l });
                       }}
-                      title={l.GroupName + ' - ID: ' + l.GroupId}
+                      title={l.GroupName}
+                      titleStyle={{fontWeight: 'bold'}}
                     />
                   );
                 }

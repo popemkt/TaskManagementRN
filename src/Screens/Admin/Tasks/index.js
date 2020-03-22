@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Input, ListItem } from 'react-native-elements';
 import React, { useContext, useEffect, useState } from 'react';
 import { getDatetime, truncate } from '../../../Common/utils';
@@ -10,6 +10,8 @@ import OptionModal from './Modals/OptionModal/OptionModal';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { getAllTasks } from '../../../Services/taskServices';
 import { useIsFocused } from '@react-navigation/native';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default function Tasks({ navigation }) {
   const admin = useContext(AdminContext);
@@ -28,7 +30,7 @@ export default function Tasks({ navigation }) {
     name: 'wrench',
     type: 'font-awesome',
     color: '#2089dc',
-  }
+  };
 
   const filter = l => {
     return Boolean(
@@ -90,7 +92,7 @@ export default function Tasks({ navigation }) {
       <View style={s.row}>
         <Button
           title='Options '
-          icon={{ name: 'filter', size: 10 }}
+          icon={{ name: 'cog', size: 10 }}
           buttonStyle={{ marginLeft: 10 }}
           onPress={() => setOptionModalVisibility(true)}
           style={{ color: 'red' }}
@@ -115,7 +117,7 @@ export default function Tasks({ navigation }) {
           onPress={() => navigation.navigate('CreateTask')}
         />
       </View>
-      <View style={{ width: '100%' }}>
+      <View style={{ width: '100%', height: SCREEN_HEIGHT-190 }}>
         <ScrollView
           contentContainerStyle={{
             paddingVertical: 8,

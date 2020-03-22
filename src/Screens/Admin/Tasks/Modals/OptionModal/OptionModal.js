@@ -1,13 +1,18 @@
 import { Button, Picker, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
 
 import DateTimePicker from '../../../../../Components/DatetimePicker';
-import Modal from 'react-native-modal';
+import { Overlay } from 'react-native-elements';
+import React from 'react';
 
 function OptionModal({ isVisible, setIsVisile, options, setOptions }) {
   return (
-    <Modal isVisible={isVisible} style={{ alignItems: 'center' }}>
-      <View style={s.modal}>
+    <Overlay
+      width='auto'
+      height='auto'
+      isVisible={isVisible}
+      overlayStyle={s.modal}
+    >
+      <View>
         <Text>{'Options'}</Text>
         <View style={s.row}>
           <Text>{'Status'}</Text>
@@ -42,12 +47,14 @@ function OptionModal({ isVisible, setIsVisile, options, setOptions }) {
         </View>
         <View
           style={{
+            width: '100%',
             flexDirection: 'row',
-            justifyContent: 'space-evenly',
+            marginTop: 20,
+            justifyContent: 'space-around',
           }}
         >
           <Button
-            style={s.margin}
+            style={{...s.margin, flex: 1}}
             title='OK'
             onPress={() => {
               setIsVisile(false);
@@ -55,28 +62,31 @@ function OptionModal({ isVisible, setIsVisile, options, setOptions }) {
             }}
           />
           <Button
-            style={s.margin}
+            color='red'
+            style={{...s.margin, flex: 1}}
             title='Cancel'
-            onPress={() => setIsVisile(false)}
+            onPress={() => {setIsVisile(false), setOptions({...options, filter: false})}}
           />
         </View>
       </View>
-    </Modal>
+    </Overlay>
   );
 }
 
 const s = StyleSheet.create({
   modal: {
-    backgroundColor: 'white',
     alignItems: 'center',
     flexWrap: 'wrap',
     paddingHorizontal: 20,
+    width: '80%',
     paddingVertical: 10,
   },
   margin: {
     marginHorizontal: 10,
   },
   row: {
+    marginVertical: 4,
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },

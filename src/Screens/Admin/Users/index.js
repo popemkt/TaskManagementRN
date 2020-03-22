@@ -22,7 +22,7 @@ export default function Users({ navigation }) {
 
   const filter = l => {
     return Boolean(
-      l.RoleID !== 1 &&
+      l.RoleId !== 1 &&
         (!userSearch ||
           (userSearch &&
             (l.Username.toLowerCase().includes(userSearch.toLowerCase()) ||

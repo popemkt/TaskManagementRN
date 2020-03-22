@@ -21,13 +21,12 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState('');
-  const [checked, setChecked] = useState(false);
   const [password, setPassord] = useState('');
   const [marginTop, setMarginTop] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
   const onKeyboardShow = () => {
-    setMarginTop(-300);
+    setMarginTop(-100);
   };
 
   const onKeyboardHide = () => {

@@ -16,6 +16,11 @@ export async function getTaskDetails(id) {
   return res;
 }
 
+export async function deleteTask(id) {
+  let res = await axios.get(`${BASE_URL}Task/${id}`);
+  return res;
+}
+
 export async function updateTaskDetails(task) {
   let data = new FormData();
   data.append('TaskId', task.TaskId);

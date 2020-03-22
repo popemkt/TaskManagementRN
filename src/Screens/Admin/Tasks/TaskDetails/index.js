@@ -8,37 +8,40 @@ import {
   View,
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import { getTaskDetails, updateTaskDetails } from '../../../../Services/taskServices';
+import {
+  getTaskDetails,
+  updateTaskDetails,
+} from '../../../../Services/taskServices';
 
-import {AdminContext} from '../../../../Contexts';
-import {BASE_URL} from '../../../../Constants/configs'
+import { AdminContext } from '../../../../Contexts';
+import { BASE_URL } from '../../../../Constants/configs';
 import Button from '../../../../Components/Button';
 import ImagePicker from '../../../../Components/ImagePicker';
 import { getDatetime } from '../../../../Common/utils';
 import { useIsFocused } from '@react-navigation/native';
 
-function TaskDetails({navigation, route }) {
+function TaskDetails({ navigation, route }) {
   const [name] = useState(route.params?.TaskName);
   const [task, setTask] = useState({ ...route.params });
   const focused = useIsFocused();
   const admin = useContext(AdminContext);
 
   useEffect(() => {
-    if (focused) getTaskDetails(task.TaskId)
-      .then(res => {
-        setTask(res.data.Data)
-      })
-  }, [focused])
+    if (focused)
+      getTaskDetails(task.TaskId).then(res => {
+        setTask(res.data.Data);
+      });
+  }, [focused]);
 
   const onUpdate = () => {
     console.log(JSON.stringify(task));
-    setTask({...task, Updater : admin.Id})
+    setTask({ ...task, Updater: admin.Id });
     updateTaskDetails(task).then(res => {
-      Alert.alert('Info',res.data.Message);
+      Alert.alert('Info', res.data.Message);
       // SendNoti(task.Processor, "Your task has been updated")
       navigation.goBack();
-    })
-  }
+    });
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -103,7 +106,7 @@ function TaskDetails({navigation, route }) {
                 setTask({ ...task, Mark: itemValue })
               }
             >
-              <Picker.Item label='0' value={null} />
+              <Picker.Item label='Not set' value={null} />
               <Picker.Item label='1' value={1} />
               <Picker.Item label='2' value={2} />
               <Picker.Item label='3' value={3} />
@@ -114,7 +117,6 @@ function TaskDetails({navigation, route }) {
               <Picker.Item label='8' value={8} />
               <Picker.Item label='9' value={9} />
               <Picker.Item label='10' value={10} />
-
             </Picker>
           </View>
           <View style={{ flexDirection: 'row' }}>
@@ -140,11 +142,22 @@ function TaskDetails({navigation, route }) {
           <Text style={s.label}>{`Time due: ${getDatetime(
             task.CreationTime,
           )}`}</Text>
-          <Text
-            style={s.label}
-          >{`Time last updated: ${getDatetime(task.TimeUpdated)}`}</Text>
+          <Text style={s.label}>{`Time last updated: ${getDatetime(
+            task.TimeUpdated,
+          )}`}</Text>
           <Text style={s.label}>{'Image confirmation'}</Text>
-          <ImagePicker image={task.ImageConfirmation ? (task.ImageConfirmation.includes('uploads')? BASE_URL+task.ImageConfirmation : task.ImageConfirmation):null} setImage={(i) =>{setTask({...task, ImageConfirmation:i}) }} />
+          <ImagePicker
+            image={
+              task.ImageConfirmation
+                ? task.ImageConfirmation.includes('uploads')
+                  ? BASE_URL + task.ImageConfirmation
+                  : task.ImageConfirmation
+                : null
+            }
+            setImage={i => {
+              setTask({ ...task, ImageConfirmation: i });
+            }}
+          />
           <View style={{ ...s.row, marginVertical: 20 }}>
             <Button
               title='DELETE'

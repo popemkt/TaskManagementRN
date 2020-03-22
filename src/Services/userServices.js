@@ -12,3 +12,15 @@ export async function loadAllUsers(id) {
   let res = await axios.get(`${BASE_URL}User/Group/${id}`);
   return res;
 }
+
+export async function deleteUser(id) {
+  let res = await axios.delete(`${BASE_URL}User/${id}`, {
+    params: { foo: 'bar' },
+  });
+  return res;
+}
+
+export async function updateUser(user) {
+  let res = await axios.put(`${BASE_URL}User/`, user);
+  return res;
+}

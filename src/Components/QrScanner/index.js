@@ -1,8 +1,8 @@
-import { Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, StyleSheet, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import Modal from 'react-native-modal';
+import { Overlay } from 'react-native-elements';
 
 export default function QrScanner({ isVisible, setIsVisible, action }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -28,7 +28,9 @@ export default function QrScanner({ isVisible, setIsVisible, action }) {
   }
 
   return (
-    <Modal
+    <Overlay
+      width='auto'
+      height='auto'
       isVisible={isVisible}
       style={{
         alignItems: 'center',
@@ -64,7 +66,7 @@ export default function QrScanner({ isVisible, setIsVisible, action }) {
           }}
         />
       </View>
-    </Modal>
+    </Overlay>
   );
 }
 

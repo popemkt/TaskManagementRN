@@ -6,17 +6,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Icon, Input, ListItem } from 'react-native-elements';
+import { Icon, Input, ListItem, Overlay } from 'react-native-elements';
 import React, { useEffect, useState } from 'react';
 
 import Button from '../Button';
-import Modal from 'react-native-modal';
 import { loadAllUsers } from '../../Services/userServices';
 import { theme } from '../../Constants/configs';
 
-function UserChooser({ isVisible, setIsVisible, action, criteria }) {
+function UserChooser({
+  title = 'Choose a user',
+  isVisible,
+  setIsVisible,
+  action,
+  criteria,
+  errMessage = 'No user found!',
+}) {
   const [listUsers, setListUsers] = useState();
   const [userSearch, setUserSearch] = useState();
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (isVisible)
@@ -42,12 +49,14 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
   };
 
   return (
-    <Modal
+    <Overlay
       onBackButtonPress={() => setIsVisible(false)}
       onBackdropPress={() => setIsVisible(false)}
       hideModalContentWhileAnimating={true}
       propagateSwipe={true}
-      isVisible={isVisible}
+      isVisible={isVisible || false}
+      width='auto'
+      height='auto'
       style={{
         alignItems: 'center',
         alignContent: 'center',
@@ -62,7 +71,7 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
           width: 350,
         }}
       >
-        <Text>{'Choose a User'}</Text>
+        <Text style={{fontWeight: 'bold'}}>{title}</Text>
         <Input
           rightIcon={
             <Icon
@@ -77,7 +86,10 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
           containerStyle={{ width: '90%' }}
           placeholder='Username'
         />
-        <View style={{ width: '100%', height: 250 }}>
+        {count === 0 ? (
+          <Text style={{ color: 'red', paddingTop: 20, fontSize: 20 }}>{errMessage}</Text>
+        ) : null}
+        <View style={{ width: '100%', height: count !== 0 ? 250 : 50}}>
           <TouchableOpacity>
             <ScrollView
               contentContainerStyle={{
@@ -85,30 +97,34 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
               }}
             >
               {listUsers
-                ? listUsers.map((l, i) =>
-                    filter(l) ? (
-                      <ListItem
-                        Component={TouchableOpacity}
-                        style={s.listItem}
-                        roundAvatar
-                        chevron
-                        subtitle={l.Fullname}
-                        bottomDivider
-                        leftIcon={{
-                          name: 'user',
-                          type: 'font-awesome',
-                          color: theme.colors.blue,
-                        }}
-                        key={i}
-                        onPress={() => {
-                          action(l);
-                          setIsVisible(false);
-                        }}
-                        rightTitle={l.Id + ' ID'}
-                        title={l.Username.toString()}
-                      />
-                    ) : null,
-                  )
+                ? listUsers.map((l, i) => {
+                    let show = filter(l);
+                    if (show) {
+                      if (count === 0) setCount(1);
+                      return (
+                        <ListItem
+                          Component={TouchableOpacity}
+                          style={s.listItem}
+                          roundAvatar
+                          chevron
+                          subtitle={l.Fullname}
+                          bottomDivider
+                          leftIcon={{
+                            name: 'user',
+                            type: 'font-awesome',
+                            color: theme.colors.blue,
+                          }}
+                          key={i}
+                          onPress={() => {
+                            action(l);
+                            setIsVisible(false);
+                          }}
+                          rightTitle={l.Id + ' ID'}
+                          title={l.Username.toString()}
+                        />
+                      );
+                    }
+                  })
                 : null}
             </ScrollView>
           </TouchableOpacity>
@@ -119,7 +135,7 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
           title='Cancel'
         />
       </View>
-    </Modal>
+    </Overlay>
   );
 }
 

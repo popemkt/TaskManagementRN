@@ -1,36 +1,62 @@
-import { Input, ListItem } from 'react-native-elements';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  getGroupDetails,
+  moveToGroup,
+} from '../../../../Services/groupServices';
 
 import Button from '../../../../Components/Button';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import { ListItem } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import UserChooser from '../../../../Components/UserChooser';
-import database from '../../../../Services';
 import { theme } from '../../../../Constants/configs';
+import { useIsFocused } from '@react-navigation/native';
 
-export default function Users({ navigation, route }) {
+export default function GroupMembers({ navigation, route }) {
   const groupInfo = { ...route.params };
   const [listUsers, setListUsers] = useState([]);
+  const [hasManager, setHasManager] = useState(false);
   const [modalVisibility, setModalVisibility] = useState(false);
-  const [chosenUser, setChosenUser] = useState(null);
+  const [update, setUpdate] = useState();
+  const focused = useIsFocused();
 
   const filter = l => {
     return Boolean(true);
   };
 
+  const onChosen = l => {
+    moveToGroup(l, groupInfo.GroupId)
+      .then(res => {
+        Alert.alert('Info', 'Add user successful!');
+        setUpdate(!update);
+      })
+      .catch(err => Alert.alert(JSON.stringify(err)));
+  };
+
   useEffect(() => {
-    console.log(chosenUser);
-    setListUsers(database.users);
-  }, [chosenUser]);
+    if (focused && !modalVisibility)
+      getGroupDetails(groupInfo.GroupId)
+        .then(res => {
+          setListUsers(res.data.Data);
+        })
+        .catch(err => {
+          console.log(JSON.stringify(err));
+        });
+  }, [focused, modalVisibility, update]);
 
   return (
     <View style={s.container}>
       <UserChooser
+        title={hasManager ? 'Choose a User' : 'Choose a Manager'}
         isVisible={modalVisibility}
         setIsVisible={setModalVisibility}
-        action={setChosenUser}
-        criteria={l => l.RoleID !== 2}
+        action={onChosen}
+        criteria={l => {
+          return Boolean(
+            (hasManager ? l.RoleId !== 2 : l.RoleId === 2 && !l.GroupId) &&
+              l.GroupId !== groupInfo.GroupId,
+          );
+        }}
       />
       <Text style={s.header}>{"Group's Users"}</Text>
       <View
@@ -53,9 +79,11 @@ export default function Users({ navigation, route }) {
             paddingVertical: 8,
           }}
         >
-          {listUsers
-            ? listUsers.map((l, i) =>
-                filter(l) ? (
+          {listUsers.length > 0
+            ? listUsers.map((l, i) => {
+                if (l.RoleId === 2 && !hasManager) setHasManager(true);
+                let show = filter(l);
+                return show ? (
                   <ListItem
                     Component={TouchableOpacity}
                     style={s.listItem}
@@ -72,8 +100,8 @@ export default function Users({ navigation, route }) {
                     rightTitle={l.Id + ' ID'}
                     title={l.Username.toString()}
                   />
-                ) : null,
-              )
+                ) : null;
+              })
             : null}
         </ScrollView>
       </View>

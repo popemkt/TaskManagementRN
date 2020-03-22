@@ -1,15 +1,59 @@
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { deleteUser, updateUser } from '../../../../Services/userServices';
 
 import Button from '../../../../Components/Button';
 
-export default function Admin({ admin, navigation, data, route }) {
+export default function Admin({ navigation, route }) {
   const [name] = useState(route.params?.Username);
   const [user, setUser] = useState({ ...route.params });
+  const [newPassword, setNewPassword] = useState('');
+
+  const validation = () => {
+    let validation = [];
+    if (!user.Username.trim() && user.Username < 6)
+      validation.push('Username must be more than 6 characters!\n');
+    if (newPassword.trim() && newPassword.length < 6)
+      validation.push('Password must be more than 6 characters!\n');
+    if (validation.length > 0) {
+      Alert.alert('Validation error', validation.join(''));
+      return false;
+    }
+    return true;
+  };
+
+  const onUpdate = () => {
+    let tempUser = { ...user };
+    if (newPassword) {
+      setUser({ ...user });
+      tempUser = { ...user, Password: user.Password + '-' + newPassword };
+    }
+    console.log('new pass: ' + newPassword + JSON.stringify(tempUser));
+    if (validation()) {
+      updateUser(tempUser)
+        .then(res => {
+          Alert.alert('Info', 'Update successful!');
+          navigation.goBack();
+        })
+        .catch(err => Alert.alert('Error', 'Network Error'));
+    }
+  };
+
+  const onDelete = () => {
+    deleteUser(user.Id)
+      .then(res => {
+        Alert.alert('Info', 'Delete sucessful');
+        navigation.goBack();
+      })
+      .catch(err => console.log(err));
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{name || 'User'}</Text>
       <Text style={styles.minorHeader}>{'User Details\n'}</Text>
+      <Text style={styles.label}>{`User Id: ${user.Id}`}</Text>
+      <Text style={styles.label}>{`Username: ${user.Username}`}</Text>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>{'Fullname'}</Text>
         <TextInput
@@ -19,31 +63,45 @@ export default function Admin({ admin, navigation, data, route }) {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>{'Address'}</Text>
+        <Text style={styles.label}>{'New Password'}</Text>
         <TextInput
+          secureTextEntry
           style={styles.input}
-          value={user.Address}
-          onChangeText={text => setUser({ ...user, Address: text })}
+          placeholder='New password'
+          value={newPassword}
+          onChangeText={text => setNewPassword(text)}
           maxLength={40}
         />
       </View>
       <View>
-        <Text style={styles.label}>{`User Id: ${user.Id}`}</Text>
-        <Text style={styles.label}>{`Username: ${user.Username}`}</Text>
-        <Text style={styles.label}>{`Phone: ${user.Phone}`}</Text>
         <Text style={styles.label}>{`Role: ${user.RoleName}`}</Text>
-        <Text style={styles.label}>{`Mail: ${user.Mail}`}</Text>
-        <Text style={styles.label}>{`DoB: ${user.DoB}`}</Text>
-        <Text style={styles.label}>{`Group: ${user.GroupName}`}</Text>
+        <Text style={styles.label}>{`Group: ${
+          user.GroupName && user.GroupName !== 'null'
+            ? user.GroupName
+            : 'No group'
+        }`}</Text>
         <View style={{ ...styles.row, marginVertical: 20 }}>
           <Button
             title='DELETE'
-            // onPress={}
+            onPress={() => {
+              Alert.alert(
+                'Warning',
+                `Are you sure want to delete user ${user.Username}`,
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                  },
+                  { text: 'Yes', onPress: onDelete },
+                ],
+                { cancelable: false },
+              );
+            }}
             buttonStyle={{ backgroundColor: 'red' }}
           />
           <Button
             title='UPDATE'
-            // onPress={}
+            onPress={onUpdate}
             buttonStyle={{ backgroundColor: 'green' }}
           />
           <Button
