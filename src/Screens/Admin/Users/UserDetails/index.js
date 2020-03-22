@@ -35,7 +35,7 @@ export default function Admin({ admin, navigation, data, route }) {
         <Text style={styles.label}>{`Mail: ${user.Mail}`}</Text>
         <Text style={styles.label}>{`DoB: ${user.DoB}`}</Text>
         <Text style={styles.label}>{`Group: ${user.GroupName}`}</Text>
-        <View style={{...styles.row, marginVertical: 20}}>
+        <View style={{ ...styles.row, marginVertical: 20 }}>
           <Button
             title='DELETE'
             // onPress={}
@@ -45,6 +45,11 @@ export default function Admin({ admin, navigation, data, route }) {
             title='UPDATE'
             // onPress={}
             buttonStyle={{ backgroundColor: 'green' }}
+          />
+          <Button
+            title='CANCEL'
+            onPress={() => navigation.goBack()}
+            buttonStyle={{ backgroundColor: 'grey' }}
           />
         </View>
       </View>

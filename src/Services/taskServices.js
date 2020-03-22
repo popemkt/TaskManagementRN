@@ -27,7 +27,7 @@ export async function updateTaskDetails(task) {
   data.append('Status', task.Status);
   data.append('Acceptance', task.Acceptance);
   data.append('Processor', task.Processor);
-  if (!task.ImageConfirmation && task.ImageConfirmation.includes('file')) {
+  if (task.ImageConfirmation && task.ImageConfirmation.includes('file')) {
     data.append('img', {
       uri: task.ImageConfirmation,
       name: 'image.jpg',

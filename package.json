@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build:android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && react-native run-android",
-    "android": "react-native run-android --verbose",
+    "android": "react-native run-android --verbose --no-jetifier",
     "ios": "react-native run-ios",
     "web": "expo start --web",
     "start": "react-native start",

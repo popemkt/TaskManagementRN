@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { getDatetime } from '../../Common/utils'
 
-const MyDateTimePicker = ({ date, setDate }) => {
+const MyDateTimePicker = ({ date, setDate , ...moreProps}) => {
   const [mode, setMode] = useState();
   const [show, setShow] = useState(false);
   const [reset, setReset] = useState(true);
@@ -30,7 +31,7 @@ const MyDateTimePicker = ({ date, setDate }) => {
   return (
     <View>
       <TouchableOpacity onPress={showTimepicker}>
-        <Text  >{date?.toString() || 'Select Date'} </Text>
+        <Text  >{date ? getDatetime(date) : 'Select Date'} </Text>
       </TouchableOpacity>
       {(show&&reset) && (
         <DateTimePicker
@@ -40,6 +41,7 @@ const MyDateTimePicker = ({ date, setDate }) => {
           is24Hour={true}
           display='default'
           onChange={onChange}
+          {...moreProps}
         />
       )}
     </View>

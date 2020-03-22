@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
@@ -9,11 +9,12 @@ export default function QrScanner({ isVisible, setIsVisible, action }) {
   const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    if (isVisible)
+      (async () => {
+        const { status } = await BarCodeScanner.requestPermissionsAsync();
+        setHasPermission(status === 'granted');
+      })();
+  }, [isVisible]);
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
@@ -21,11 +22,9 @@ export default function QrScanner({ isVisible, setIsVisible, action }) {
     action(data);
   };
 
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
-  }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    Alert.alert('Info', 'No permission to use camera!');
+    return;
   }
 
   return (

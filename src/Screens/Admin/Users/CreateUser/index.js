@@ -1,14 +1,65 @@
-import { Picker, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Alert,
+  Picker,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import React, { useState } from 'react';
 
 import Button from '../../../../Components/Button';
+import { createUser } from '../../../../Services/userServices';
 
-function CreateUser() {
+function CreateUser({ navigation }) {
   const [userInfo, setUserInfo] = useState({
     Username: null,
     Password: null,
     ConfirmPassword: null,
+    RoleID: 2,
+    Fullname: null,
   });
+
+  const onConfirm = () => {
+    if (validation()) {
+      createUser(
+        userInfo.Username,
+        userInfo.Password,
+        userInfo.Fullname,
+        userInfo.RoleID,
+      )
+        .then(res => {
+          Alert.alert('Info', res.data.Message);
+          navigation.goBack();
+        })
+        .catch(err => {
+          Alert.alert('Error', res.data.Message);
+        });
+    }
+  };
+
+  const validation = () => {
+    let validation = [];
+    let confirmError = '';
+    if (!userInfo.Username) validation.push('Username');
+    if (!userInfo.Password) validation.push('Password');
+    if (!userInfo.ConfirmPassword) validation.push('ConfirmPassword');
+    if (!userInfo.Fullname) validation.push('Fullname');
+    else if (userInfo.ConfirmPassword !== userInfo.Password) {
+      confirmError = '\nPassword not matched!';
+    }
+    if (validation.length > 0 || confirmError) {
+      Alert.alert(
+        'Validation error',
+        (validation.length > 0
+          ? `${validation.join(', ')} must not be empty!`
+          : '') + confirmError,
+      );
+      return false;
+    }
+    return true;
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -57,26 +108,40 @@ function CreateUser() {
             maxLength={40}
           />
         </View>
+        <View style={s.inputContainer}>
+          <Text style={s.label}>{'Fullname'}</Text>
+          <TextInput
+            placeholder='Enter fullname'
+            style={s.input}
+            multiline
+            value={userInfo.Fullname}
+            onChangeText={text => setUserInfo({ ...userInfo, Fullname: text })}
+          />
+        </View>
         <View style={{ ...s.row, justifyContent: 'flex-start' }}>
           <Text style={s.label}>{'Role: '}</Text>
           <Picker
-              selectedValue={userInfo.RoleID}
-              style={{ height: 30,width: 150 }}
-              onValueChange={(itemValue, itemIndex) =>
-                setUserInfo({ ...userInfo, RoleID: itemValue })
-              }
-            >
-              <Picker.Item label='Manager' value={2} />
-              <Picker.Item label='Employee' value={3} />
-            </Picker>
+            selectedValue={userInfo.RoleID}
+            style={{ height: 30, width: 150 }}
+            onValueChange={(itemValue, itemIndex) =>
+              setUserInfo({ ...userInfo, RoleID: itemValue })
+            }
+          >
+            <Picker.Item label='Manager' value={2} />
+            <Picker.Item label='Employee' value={3} />
+          </Picker>
         </View>
         <View>
-          <Text style={s.label}>{`Processor:`}</Text>
           <View style={s.row}>
             <Button
               title='CONFIRM'
-              // onPress={}
+              onPress={onConfirm}
               buttonStyle={{ backgroundColor: 'green' }}
+            />
+            <Button
+              title='CANCEL'
+              onPress={() => navigation.goBack()}
+              buttonStyle={{ backgroundColor: 'grey' }}
             />
           </View>
         </View>
@@ -107,7 +172,6 @@ const s = StyleSheet.create({
   },
   inputContainer: {
     marginTop: 10,
-    width: '95%',
   },
   minorHeader: {
     fontSize: 20,
@@ -126,12 +190,13 @@ const s = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: 'grey',
     width: '100%',
+    height: 40,
     paddingLeft: 7,
-    paddingTop: 5,
     textAlignVertical: 'top',
   },
   label: {
     marginVertical: 4,
+    fontSize: 15,
   },
 });
 

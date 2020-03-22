@@ -1,16 +1,17 @@
-import { Icon, Input, ListItem } from 'react-native-elements';
-import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Icon, Input, ListItem } from 'react-native-elements';
+import React, { useEffect, useState } from 'react';
 
 import Button from '../Button';
 import Modal from 'react-native-modal';
-import db from '../../Services';
+import { loadAllUsers } from '../../Services/userServices';
 import { theme } from '../../Constants/configs';
 
 function UserChooser({ isVisible, setIsVisible, action, criteria }) {
@@ -18,13 +19,21 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
   const [userSearch, setUserSearch] = useState();
 
   useEffect(() => {
-    setListUsers(db.users);
-  });
+    if (isVisible)
+      loadAllUsers(1)
+        .then(res => {
+          setListUsers(res.data.Data);
+        })
+        .catch(err => {
+          Alert.alert('Error', 'Error fetching users!');
+          console.log(JSON.stringify(err));
+        });
+  }, [isVisible]);
 
   const filter = l => {
     return Boolean(
       (criteria ? criteria(l) : true) &&
-        l.RoleID !== 1 &&
+        l.RoleId !== 1 &&
         (!userSearch ||
           (userSearch &&
             (l.Username.toLowerCase().includes(userSearch.toLowerCase()) ||
@@ -34,20 +43,23 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
 
   return (
     <Modal
+      onBackButtonPress={() => setIsVisible(false)}
+      onBackdropPress={() => setIsVisible(false)}
+      hideModalContentWhileAnimating={true}
+      propagateSwipe={true}
       isVisible={isVisible}
       style={{
         alignItems: 'center',
         alignContent: 'center',
-        justifyContent: 'center',
       }}
+      swipeDirection={['up', 'down']}
     >
       <View
         style={{
           ...s.modal,
           paddingVertical: 10,
           paddingHorizontal: 20,
-          width: 300,
-          height: 450,
+          width: 350,
         }}
       >
         <Text>{'Choose a User'}</Text>
@@ -65,39 +77,41 @@ function UserChooser({ isVisible, setIsVisible, action, criteria }) {
           containerStyle={{ width: '90%' }}
           placeholder='Username'
         />
-        <View style={{ width: '100%' }}>
-          <ScrollView
-            contentContainerStyle={{
-              paddingVertical: 8,
-            }}
-          >
-            {listUsers
-              ? listUsers.map((l, i) =>
-                  filter(l) ? (
-                    <ListItem
-                      Component={TouchableOpacity}
-                      style={s.listItem}
-                      roundAvatar
-                      chevron
-                      subtitle={l.Fullname}
-                      bottomDivider
-                      leftIcon={{
-                        name: 'user',
-                        type: 'font-awesome',
-                        color: theme.colors.blue,
-                      }}
-                      key={i}
-                      onPress={() => {
-                        action(l);
-                        setIsVisible(false);
-                      }}
-                      rightTitle={l.Id + ' ID'}
-                      title={l.Username.toString()}
-                    />
-                  ) : null,
-                )
-              : null}
-          </ScrollView>
+        <View style={{ width: '100%', height: 250 }}>
+          <TouchableOpacity>
+            <ScrollView
+              contentContainerStyle={{
+                paddingVertical: 8,
+              }}
+            >
+              {listUsers
+                ? listUsers.map((l, i) =>
+                    filter(l) ? (
+                      <ListItem
+                        Component={TouchableOpacity}
+                        style={s.listItem}
+                        roundAvatar
+                        chevron
+                        subtitle={l.Fullname}
+                        bottomDivider
+                        leftIcon={{
+                          name: 'user',
+                          type: 'font-awesome',
+                          color: theme.colors.blue,
+                        }}
+                        key={i}
+                        onPress={() => {
+                          action(l);
+                          setIsVisible(false);
+                        }}
+                        rightTitle={l.Id + ' ID'}
+                        title={l.Username.toString()}
+                      />
+                    ) : null,
+                  )
+                : null}
+            </ScrollView>
+          </TouchableOpacity>
         </View>
         <Button
           style={s.button}
@@ -121,7 +135,8 @@ const s = StyleSheet.create({
   },
   button: {
     position: 'absolute',
-    top: '90%',
+    bottom: 10,
+    left: 10,
   },
 });
 

@@ -4,5 +4,5 @@ export function truncate(text, limit) {
 
 export function getDatetime(dateString) {
   let d = new Date(dateString);
-  return d.toUTCString();
+  return d.toUTCString().replace(' GMT', '');
 }

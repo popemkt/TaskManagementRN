@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -7,26 +7,66 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import React, { useContext, useState } from 'react';
 
+import { AdminContext } from '../../../../Contexts';
 import Button from '../../../../Components/Button';
 import DatetimePicker from '../../../../Components/DatetimePicker';
+import { SendNoti } from '../../../../Services/commonServices';
 import UserChooser from '../../../../Components/UserChooser';
+import { createTask } from '../../../../Services/taskServices';
 
-function CreateTask() {
+function CreateTask({ navigation }) {
+  const admin = useContext(AdminContext);
   const [isVisible, setIsVisible] = useState();
   const [task, setTask] = useState({
-    Description: null,
-    Name: null,
-    dueDate: null,
-    ProcessorId: null,
+    ContentAssigned: null,
+    TaskName: null,
+    DueDate: null,
+    Processor: null,
+    ProcessorName: null,
+    Creator: admin.Id,
   });
+
+  const onConfirm = () => {
+    if (validation())
+      createTask(task)
+        .then(res => {
+          Alert.alert('Info', res.data.Message);
+          SendNoti(task.Processor, 'You have a new task');
+          navigation.goBack();
+        })
+        .catch(err => {
+          Alert.alert('Error', err.data.Message);
+        });
+  };
+
+  const validation = () => {
+    let validation = [];
+
+    if (!task.ContentAssigned) validation.push('Work assigned');
+    if (!task.DueDate) validation.push('Due date');
+    if (!task.Processor) validation.push('Processor');
+    if (!task.TaskName) validation.push('Name');
+    if (validation.length > 0) {
+      Alert.alert(
+        'Validation error',
+        `${validation.join(', ')} must not be empty!`,
+      );
+      return false;
+    }
+    if (task.DueDate) return true;
+    return true;
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <UserChooser
         isVisible={isVisible}
         setIsVisible={setIsVisible}
-        action={t => setTask({ ...task, ProcessorId: t.Id })}
+        action={t =>
+          setTask({ ...task, Processor: t.Id, ProcessorName: t.Fullname })
+        }
       />
       <ScrollView
         contentContainerStyle={{
@@ -37,54 +77,58 @@ function CreateTask() {
       >
         <Text style={s.header}>{'Create Task'}</Text>
         <Text style={s.minorHeader}>{'Task Details\n'}</Text>
-        <View style={s.inputContainer}>
-          <Text style={s.label}>{'Description'}</Text>
-          <TextInput
-            placeholder='Enter description'
-            style={s.input}
-            numberOfLines={4}
-            multiline
-            value={task.Description}
-            onChangeText={text => setTask({ ...task, Description: text })}
-          />
-        </View>
 
         <View style={s.inputContainer}>
           <Text style={s.label}>{'Name'}</Text>
           <TextInput
-            placeholder='Enter description'
+            placeholder='Enter name'
             style={s.input}
-            value={task.Name}
-            onChangeText={text => setTask({ ...task, Name: text })}
+            value={task.TaskName}
+            onChangeText={text => setTask({ ...task, TaskName: text })}
             maxLength={40}
           />
         </View>
+        <View style={s.inputContainer}>
+          <Text style={s.label}>{'Work assigned'}</Text>
+          <TextInput
+            placeholder='Enter work assigned'
+            style={s.input}
+            numberOfLines={4}
+            multiline
+            value={task.ContentAssigned}
+            onChangeText={text => setTask({ ...task, ContentAssigned: text })}
+          />
+        </View>
+
         <View style={{ ...s.row, justifyContent: 'flex-start' }}>
           <Text>{'Due date:  '}</Text>
           <DatetimePicker
-            date={task.dueDate}
-            setDate={date => setTask({ ...task, dueDate: date })}
+            date={task.DueDate}
+            setDate={date => setTask({ ...task, DueDate: date })}
+            minimumDate={new Date()}
           />
         </View>
         <View>
-          <TouchableOpacity onPress={() => setIsVisible(true)}>
-            <Text style={s.label}>
-              {'Processor: ' +
-                (task.ProcessorId
-                  ? task.ProcessorId
-                  : 'Touch to select processor')}
-            </Text>
-          </TouchableOpacity>
+          <View style={{ ...s.row, justifyContent: 'flex-start' }}>
+            <Text style={s.label}>{'Processor: '}</Text>
+            <TouchableOpacity onPress={() => setIsVisible(true)}>
+              <Text style={s.label}>
+                {task.Processor
+                  ? task.ProcessorName
+                  : 'Touch to select processor'}
+              </Text>
+            </TouchableOpacity>
+          </View>
           <View style={s.row}>
             <Button
               title='CONFIRM'
-              // onPress={}
+              onPress={onConfirm}
               buttonStyle={{ backgroundColor: 'green' }}
             />
             <Button
               title='CANCEL'
-              // onPress={}
-              buttonStyle={{ backgroundColor: 'red' }}
+              onPress={() => navigation.goBack()}
+              buttonStyle={{ backgroundColor: 'grey' }}
             />
           </View>
         </View>
@@ -115,12 +159,12 @@ const s = StyleSheet.create({
   },
   inputContainer: {
     marginTop: 10,
-    width: '95%',
   },
   minorHeader: {
     fontSize: 20,
   },
   row: {
+    marginVertical: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

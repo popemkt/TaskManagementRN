@@ -1,15 +1,15 @@
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Input, ListItem } from 'react-native-elements';
 import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { getDatetime, truncate } from '../../../Common/utils';
 
 import { AdminContext } from '../../../Contexts';
 import Button from '../../../Components/Button';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import OptionModal from './Modals/OptionModal/OptionModal';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import database from '../../../Services';
-import { theme } from '../../../Constants/configs'
-import { truncate } from '../../../Common/utils';
+import { getAllTasks } from '../../../Services/taskServices';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function Tasks({ navigation }) {
   const admin = useContext(AdminContext);
@@ -23,18 +23,43 @@ export default function Tasks({ navigation }) {
     status: null,
   });
   const [optionModalVisibility, setOptionModalVisibility] = useState(false);
+  const focused = useIsFocused();
+  const icon = {
+    name: 'wrench',
+    type: 'font-awesome',
+    color: '#2089dc',
+  }
 
   const filter = l => {
     return Boolean(
-      !userSearch ||
+      (!userSearch ||
         (userSearch &&
-          l.ProcesssorName.toLowerCase().includes(userSearch.toLowerCase())),
+          l.ProcesssorName.toLowerCase().includes(userSearch.toLowerCase()))) &&
+        optionFilter(l),
     );
   };
 
+  const optionFilter = l => {
+    if (options.filter) {
+      let date = new Date(l.DueDate);
+      return (
+        Boolean(options.fromDate ? date >= options.fromDate : true) &&
+        (options.toDate ? date <= options.toDate : true) &&
+        (options.status ? options.status == l.Status : true)
+      );
+    } else return true;
+  };
+
   useEffect(() => {
-    setListTasks(database.tasks);
-  }, [searchAgain]);
+    if (focused) console.log('yes');
+    getAllTasks(admin.Id)
+      .then(res => {
+        setListTasks(res.data.Data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }, [focused, searchAgain]);
 
   return (
     <View style={s.container}>
@@ -43,7 +68,6 @@ export default function Tasks({ navigation }) {
         setIsVisile={setOptionModalVisibility}
         options={options}
         setOptions={setOptions}
-        setList={setListTasks}
       />
       <Text style={s.header}>{admin.Username || 'Admin Board'}</Text>
       <View style={s.row}>
@@ -54,6 +78,12 @@ export default function Tasks({ navigation }) {
           onPress={() => {
             setUserSearch('');
             setSearchAgain(!searchAgain);
+            setOptions({
+              filter: false,
+              fromDate: null,
+              toDate: null,
+              status: null,
+            });
           }}
         />
       </View>
@@ -85,7 +115,7 @@ export default function Tasks({ navigation }) {
           onPress={() => navigation.navigate('CreateTask')}
         />
       </View>
-      <View style={{width: '100%'}}>
+      <View style={{ width: '100%' }}>
         <ScrollView
           contentContainerStyle={{
             paddingVertical: 8,
@@ -94,29 +124,41 @@ export default function Tasks({ navigation }) {
           {listTasks
             ? listTasks.map((l, i) => {
                 if (filter(l)) {
+                  console.log(JSON.stringify(l));
                   return (
                     <ListItem
                       Component={TouchableOpacity}
                       style={s.listItem}
                       roundAvatar
                       chevron
-                      subtitle={truncate(
-                        l.ProcesssorName + ': ' + l.Description,
-                        40,
-                      )}
+                      subtitle={
+                        truncate(
+                          l.ProcesssorName +
+                            (l.ContentAssigned && l.ContentAssigned !== 'null'
+                              ? ': ' + l.ContentAssigned
+                              : ''),
+                          40,
+                        ) +
+                        ('\n' + getDatetime(l.DueDate))
+                      }
+                      titleStyle={{ fontWeight: 'bold' }}
                       bottomDivider
-                      leftIcon={{
-                        name: 'wrench',
-                        type: 'font-awesome',
-                        color: '#2089dc',
-                      }}
+                      leftIcon={icon}
                       key={l.TaskId}
                       onPress={() => {
                         navigation.navigate('TaskDetails', { ...l });
                       }}
                       rightTitle={l.StatusName}
                       rightSubtitle={l.AcceptanceName}
-                      rightTitleStyle={{color: 'green'}}
+                      rightSubtitleStyle={{
+                        color:
+                          l.Acceptance !== null
+                            ? l.Acceptance
+                              ? 'green'
+                              : 'red'
+                            : 'grey',
+                      }}
+                      rightTitleStyle={s.rightTitleStyle}
                       title={l.TaskName}
                     />
                   );
@@ -155,5 +197,8 @@ const s = StyleSheet.create({
     width: '98%',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  rightTitleStyle: {
+    fontWeight: 'bold',
   },
 });

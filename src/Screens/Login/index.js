@@ -7,9 +7,9 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Button, CheckBox } from 'react-native-elements';
 import React, { useEffect, useState } from 'react';
 
-import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import TextInput from '../../Components/TextInput';
 import { login } from '../../Services/commonServices';
@@ -21,6 +21,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState('');
+  const [checked, setChecked] = useState(false);
   const [password, setPassord] = useState('');
   const [marginTop, setMarginTop] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: 'white',
-    width: SCREEN_WIDTH - 30,
+    width: SCREEN_WIDTH - 60,
     borderRadius: 10,
     paddingTop: 32,
     paddingBottom: 32,

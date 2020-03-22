@@ -1,15 +1,21 @@
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Input, ListItem } from 'react-native-elements';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
+import { AdminContext } from '../../../Contexts';
 import Button from '../../../Components/Button';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import QrScanner from '../../../Components/QrScanner';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import database from '../../../Services';
+import { loadAllUsers } from '../../../Services/userServices';
 import { theme } from '../../../Constants/configs';
+import { useIsFocused } from '@react-navigation/native';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default function Users({ navigation }) {
+  const admin = useContext(AdminContext);
+  const focused = useIsFocused();
   const [listUsers, setListUsers] = useState([]);
   const [userSearch, setUserSearch] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -26,16 +32,29 @@ export default function Users({ navigation }) {
 
   const onScanned = data => {
     let user = listUsers.find(user => user.Id == data);
-    user ? navigation.navigate('UserDetails', {...user}) : alert('User not found!');
-  }
+    user
+      ? navigation.navigate('UserDetails', { ...user })
+      : alert('User not found!');
+  };
 
   useEffect(() => {
-    setListUsers(database.users);
-  }, []);
+    if (focused)
+      loadAllUsers(admin.Id)
+        .then(res => {
+          setListUsers(res.data.Data);
+        })
+        .catch(err => {
+          console.log('Error' + JSON.stringify(err));
+        });
+  }, [focused]);
 
   return (
     <View style={s.container}>
-      <QrScanner isVisible={isVisible} setIsVisible={setIsVisible} action={data => onScanned(data)}/>
+      <QrScanner
+        isVisible={isVisible}
+        setIsVisible={setIsVisible}
+        action={data => onScanned(data)}
+      />
       <Text style={s.header}>{'Users'}</Text>
       <View style={s.row}>
         <Input
@@ -63,13 +82,13 @@ export default function Users({ navigation }) {
           onPress={() => navigation.navigate('CreateUser')}
         />
       </View>
-      <View style={{ width: '100%' }}>
+      <View style={{ width: '100%', height: SCREEN_HEIGHT-150 }}>
         <ScrollView
           contentContainerStyle={{
             paddingVertical: 8,
           }}
         >
-          {listUsers
+          {listUsers.length > 0
             ? listUsers.map((l, i) =>
                 filter(l) ? (
                   <ListItem
@@ -96,6 +115,7 @@ export default function Users({ navigation }) {
             : null}
         </ScrollView>
       </View>
+      <Text>{'aa'}</Text>
     </View>
   );
 }
@@ -107,6 +127,7 @@ const s = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     backgroundColor: '#F5FCFF',
+    height: '100%'
   },
   header: {
     textAlign: 'center',
