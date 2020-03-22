@@ -48,7 +48,7 @@ export default function Login({ navigation }) {
       login(username, password, navigation)
         .then(response => {
           setIsLoading(false);
-          switch (response.data.Data.RoleID) {
+          switch (response.data.Data.RoleId) {
             case 1:
               navigation.navigate('Admin', { ...response.data.Data });
               break;
@@ -60,20 +60,13 @@ export default function Login({ navigation }) {
               break;
             default:
               Alert.alert('Error with server response');
+              console.log(JSON.stringify(response));
               break;
           }
         })
         .catch(err => {
-          if (username === 'admin' && password === 'admin')
-            navigation.navigate('Admin', { Username: 'UserAdmin' });
-          if (username === 'manager' && password === 'manager')
-            navigation.navigate('Manager', { Username: 'UserManager' });
-          if (username === 'user' && password === 'user')
-            navigation.navigate('User', { Username: 'User' });
-          Alert.alert(
-            'Login failed',
-            'Incorrect username or password: ' + JSON.stringify(err),
-          );
+          Alert.alert('Login failed', err.Message);
+          console.log(err);
           setIsLoading(false);
         });
     }

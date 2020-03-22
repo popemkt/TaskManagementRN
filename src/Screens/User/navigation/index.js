@@ -1,4 +1,3 @@
-import EmployeesRoutes from './Users';
 import React from 'react';
 import TasksRoutes from './Tasks';
 import { UserContext } from '../../../Contexts';

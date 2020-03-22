@@ -1,10 +1,13 @@
 {
   "scripts": {
-    "android": "react-native run-android",
+    "build:android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && react-native run-android",
+    "android": "react-native run-android --verbose",
     "ios": "react-native run-ios",
     "web": "expo start --web",
-    "start": "expo start",
+    "start": "react-native start",
+    "start:reset": "react-native start --reset-cache",
     "test": "jest",
+    "link": "react-native link",
     "amenu": "adb shell input keyevent 82"
   },
   "dependencies": {

@@ -18,7 +18,11 @@ export default function TextInput({
       placeholderTextColor='grey'
       leftIcon={
         icon ? (
-          <Icon name={icon.name} size={ icon.size || 24} color={icon.color || 'black'} />
+          <Icon
+            name={icon.name}
+            size={icon.size || 24}
+            color={icon.color || 'black'}
+          />
         ) : null
       }
       labelStyle={{ fontSize: 20, fontWeight: 'bold' }}
